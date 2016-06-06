@@ -1,0 +1,61 @@
+body {
+  font-family:'Ubuntu Mono',Monospace,Arial;
+  font-size:8pt;
+  background-color: #FF0000;
+  color: #FFFFFF;
+}
+a {
+	color:#FFFFFF;
+}
+label {
+	width:120px;
+	display:inline-block
+}
+.nodeLabel {
+	color: #FFFFFF;
+}
+path.arc {
+  cursor: move;
+  fill: #FF0000;
+}
+
+.node {
+  font-size: 10px;
+	color: #FFFFFF;
+	fill: #FFFFFF;
+}
+
+.node:hover {
+  fill: #1f77b4;
+}
+
+.link {
+  fill: none;
+  stroke: #FFFFFF;
+  stroke-opacity: .4;
+  pointer-events: none;
+}
+
+.link.source, .link.target {
+  stroke-opacity: 1;
+  stroke-width: 1px;
+}
+
+.node.target {
+	font-weight:bold;
+  fill: #2ca02c !important;
+}
+
+.link.source {
+  #stroke: #d62728;
+  stroke: #2ca02c;
+}
+
+.node.source {
+  fill: #2ca02c !important;
+  #fill: #2ca02c;
+}
+
+.link.target { 
+  stroke: #2ca02c;
+}

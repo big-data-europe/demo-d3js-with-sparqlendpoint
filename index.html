@@ -1,0 +1,49 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+		<script type="text/javascript" src="resources/javascript/d3.v3.min.js"></script>
+		<script type="text/javascript" src="resources/javascript/opendirectory-chord.js"></script>
+		<script type="text/javascript" src="resources/javascript/md5.js"></script>
+		<script type="text/javascript" src="resources/javascript/jquery-1.11.2.min.js"></script>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <link type="text/css" rel="stylesheet" href="resources/styles/style.css"/>
+  </head>
+  <body>
+		<div id="visualization" style="float:left"></div>
+		<div style="float:right;">
+			<div>
+				Settings:
+				<div id="settings" style="border-style:solid;border-color:#FFFFFF;width:400px;min-height:40px;padding:10px;">
+					<label for="search">Search:</label><input type="text" id="search" onkeyup="javascript:odc.search(this.value)"/>
+					<div id=schemeChooserContainer></div>
+				</div>
+			</div>
+			<div>
+				Details:
+				<div id="info" style="border-style:solid;border-color:#FFFFFF;width:400px;min-height:200px;padding:10px;">Click on Visualization Node</div>
+			</div>
+			<div>
+				Note:
+				<div id="note" style="border-style:solid;border-color:#FFFFFF;width:400px;padding:10px;">
+					Optimized for 2880 x 1690
+				</div>
+			</div>
+		</div>
+
+    <script type="text/javascript">
+
+			function visRedraw(sScheme){
+				document.getElementById("visualization").innerHTML = "";
+				document.getElementById("info").innerHTML = "Click on Visualization Node";
+				document.getElementById("schemeChooserContainer").innerHTML = "";
+				odc.init(sScheme);
+			}
+
+			var odc = new OpenDirectoryChord();
+				odc.init("http://vocabulary.turnguard.com/opendirectory/Arts");
+
+    </script>
+  </body>
+</html>
+
