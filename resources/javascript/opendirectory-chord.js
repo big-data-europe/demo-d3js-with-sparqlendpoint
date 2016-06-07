@@ -1,5 +1,8 @@
 OpenDirectoryChord = function(){
-	this.endpoint="http://sparql.turnguard.com/sparql?default-graph-uri="+encodeURIComponent("http://vocabulary.turnguard.com/opendirectory"),
+    /* opendirectory */
+	//this.endpoint="http://sparql.turnguard.com/sparql?default-graph-uri="+encodeURIComponent("http://vocabulary.turnguard.com/opendirectory"),
+    /* dbpedia categories */
+    this.endpoint="http://dbpedia.org/sparql?default-graph-uri="+encodeURIComponent("http://dbpedia.org"),
 	this.width=1024,
 	this.height=768,
 	this.rx=this.width/2,
@@ -9,7 +12,13 @@ OpenDirectoryChord = function(){
 	this.bundle = d3.layout.bundle(),
 	this.line = d3.svg.line.radial().interpolate("bundle").tension(.85).radius(function(d) { return d.y; }).angle(function(d) { return d.x / 180 * Math.PI; }),
 	this.getQuery = function(sScheme){
-		return encodeURIComponent("SELECT DISTINCT ?concept ?conceptLabel ?broader ?broaderLabel ?scheme ?schemeLabel WHERE { ?concept skos:inScheme ?scheme . OPTIONAL { ?concept skos:broader ?broader . ?broader skos:prefLabel ?broaderLabel FILTER(lang(?broaderLabel)='en') } . ?concept skos:prefLabel ?conceptLabel FILTER(lang(?conceptLabel)='en')  FILTER(?scheme = <<scheme>>) ?scheme dct:title ?schemeLabel FILTER(lang(?schemeLabel)='en') } LIMIT 500".replace("<scheme>",sScheme));
+
+        /* opendirectory (see queries.txt) */
+		//return encodeURIComponent("SELECT DISTINCT ?concept ?conceptLabel ?broader ?broaderLabel ?scheme ?schemeLabel WHERE { ?concept skos:inScheme ?scheme . OPTIONAL { ?concept skos:broader ?broader . ?broader skos:prefLabel ?broaderLabel FILTER(lang(?broaderLabel)='en') } . ?concept skos:prefLabel ?conceptLabel FILTER(lang(?conceptLabel)='en')  FILTER(?scheme = <<scheme>>) ?scheme dct:title ?schemeLabel FILTER(lang(?schemeLabel)='en') } LIMIT 500".replace("<scheme>",sScheme));    
+
+        /* dbpedia categories (see queries.txt) */
+        return encodeURIComponent("SELECT DISTINCT ?concept ?conceptLabel ?broader ?broaderLabel ?scheme ?schemeLabel WHERE { ?concept skos:broader+ ?scheme . OPTIONAL { ?concept skos:broader ?broader . ?broader skos:prefLabel ?broaderLabel FILTER(lang(?broaderLabel)='en') } . ?concept skos:prefLabel ?conceptLabel FILTER(lang(?conceptLabel)='en') FILTER(?scheme = <<scheme>>) ?scheme skos:prefLabel ?schemeLabel  FILTER(lang(?schemeLabel)='en') } LIMIT 500".replace("<scheme>",sScheme));
+
 	}
 };
 
@@ -180,7 +189,12 @@ OpenDirectoryChord.prototype = {
 		return a[0] * b[0] + a[1] * b[1];
 	},
 	click: function(d, instance){
-		var query = d.type=="concept"?("SELECT (IF(?p=skos:prefLabel,'a',IF(?p=skos:altLabel,'b',IF(?p=skos:definition,'c',IF(?p=skos:broader,'d',IF(?p=skos:narrower,'e',IF(?p=skos:related,'f',IF(?p=skos:subject,'g',IF(?p=dct:creator,'h',IF(?p=dct:date,'i','j'))))))))) AS ?order) (IF(?p=skos:prefLabel,'Preferred Label',IF(?p=skos:altLabel,'Alternative Label', IF(?p=skos:broader,'Broader', IF(?p=skos:narrower,'Narrower', IF(?p=skos:inScheme,'In Scheme', IF(?p=dct:date,'Created', IF(?p=dct:creator,'Creator', IF(?p=rdf:type,'Type', IF(?p=skos:definition,'Definition',IF(?p=owl:sameAs,'Same As',IF(?p=rdfs:seeAlso,'See Also',IF(?p=skos:exactMatch,'Exact Match',IF(?p=skos:subject,'Subject','Other'))))))))))))) AS ?key) (COALESCE(?value1,?value) AS ?value) WHERE { ?concept ?p ?value FILTER(?p IN (skos:prefLabel,skos:altLabel,skos:narrower,skos:broader,skos:subject,owl:sameAs,dct:date,skos:definition,dct:creator,skos:related)) FILTER(isURI(?value) || (isLiteral(?value) && lang(?value)='en') || datatype(?value)=xsd:dateTime). OPTIONAL { ?value skos:prefLabel|dct:title ?value1 FILTER(lang(?value1)='en')} FILTER(?concept=<<uri>>) } ORDER BY ?order ?value".replace("<uri>",d.uri)):("SELECT (IF(?p=dct:title,'a',IF(?p=skos:hasTopConcept,'b','c')) AS ?order) (IF(?p=dct:title,'Title',IF(?p=skos:hasTopConcept,'Top Concept', IF(?p=dct:date,'Created',IF(?p=dct:creator,'Creator','Other')))) AS ?key) (COALESCE(?value1,?value) AS ?value) WHERE { ?scheme ?p ?value FILTER(?p IN (dct:title,dct:date,dct:creator,skos:hasTopConcept)) FILTER(isURI(?value) || (isLiteral(?value) && lang(?value)='en') || datatype(?value)=xsd:dateTime). OPTIONAL { ?value skos:prefLabel|dct:title ?value1 FILTER(lang(?value1)='en')} FILTER(?scheme=<<uri>>) } ORDER BY ?order ?value".replace("<uri>",d.uri));
+        /* opendirectory */
+		//var query = d.type=="concept"?("SELECT (IF(?p=skos:prefLabel,'a',IF(?p=skos:altLabel,'b',IF(?p=skos:definition,'c',IF(?p=skos:broader,'d',IF(?p=skos:narrower,'e',IF(?p=skos:related,'f',IF(?p=skos:subject,'g',IF(?p=dct:creator,'h',IF(?p=dct:date,'i','j'))))))))) AS ?order) (IF(?p=skos:prefLabel,'Preferred Label',IF(?p=skos:altLabel,'Alternative Label', IF(?p=skos:broader,'Broader', IF(?p=skos:narrower,'Narrower', IF(?p=skos:inScheme,'In Scheme', IF(?p=dct:date,'Created', IF(?p=dct:creator,'Creator', IF(?p=rdf:type,'Type', IF(?p=skos:definition,'Definition',IF(?p=owl:sameAs,'Same As',IF(?p=rdfs:seeAlso,'See Also',IF(?p=skos:exactMatch,'Exact Match',IF(?p=skos:subject,'Subject','Other'))))))))))))) AS ?key) (COALESCE(?value1,?value) AS ?value) WHERE { ?concept ?p ?value FILTER(?p IN (skos:prefLabel,skos:altLabel,skos:narrower,skos:broader,skos:subject,owl:sameAs,dct:date,skos:definition,dct:creator,skos:related)) FILTER(isURI(?value) || (isLiteral(?value) && lang(?value)='en') || datatype(?value)=xsd:dateTime). OPTIONAL { ?value skos:prefLabel|dct:title ?value1 FILTER(lang(?value1)='en')} FILTER(?concept=<<uri>>) } ORDER BY ?order ?value".replace("<uri>",d.uri)):("SELECT (IF(?p=dct:title,'a',IF(?p=skos:hasTopConcept,'b','c')) AS ?order) (IF(?p=dct:title,'Title',IF(?p=skos:hasTopConcept,'Top Concept', IF(?p=dct:date,'Created',IF(?p=dct:creator,'Creator','Other')))) AS ?key) (COALESCE(?value1,?value) AS ?value) WHERE { ?scheme ?p ?value FILTER(?p IN (dct:title,dct:date,dct:creator,skos:hasTopConcept)) FILTER(isURI(?value) || (isLiteral(?value) && lang(?value)='en') || datatype(?value)=xsd:dateTime). OPTIONAL { ?value skos:prefLabel|dct:title ?value1 FILTER(lang(?value1)='en')} FILTER(?scheme=<<uri>>) } ORDER BY ?order ?value".replace("<uri>",d.uri));
+
+        /* dbpedia */
+        var query = "SELECT * WHERE { <<uri>> skos:prefLabel ?value . BIND('Preferred Label' AS ?key)}".replace("<uri>",d.uri);
+
 		$.ajax({
 			url: instance.endpoint+"&query="+encodeURIComponent(query),
 			headers:{
@@ -204,7 +218,12 @@ OpenDirectoryChord.prototype = {
 	},
 	createSettings: function(sScheme){
 		$.ajax({
-			url: this.endpoint+"&query="+encodeURIComponent("SELECT DISTINCT ?scheme (str(?schemeLabel) AS ?schemeLabel) WHERE { ?scheme a skos:ConceptScheme; dct:title ?schemeLabel FILTER(lang(?schemeLabel)='en') . ?scheme skos:hasTopConcept ?topConcept } ORDER BY ?schemeLabel"),
+            /* opendirectory */
+			//url: this.endpoint+"&query="+encodeURIComponent("SELECT DISTINCT ?scheme (str(?schemeLabel) AS ?schemeLabel) WHERE { ?scheme a skos:ConceptScheme; dct:title ?schemeLabel FILTER(lang(?schemeLabel)='en') . ?scheme skos:hasTopConcept ?topConcept } ORDER BY ?schemeLabel"),
+
+            /* dbpedia */
+            url: this.endpoint+"&query="+encodeURIComponent("SELECT * WHERE { ?scheme a skos:Concept FILTER(?scheme IN (<http://dbpedia.org/resource/Category:Data_analysis>,<http://dbpedia.org/resource/Category:Cloud_computing>,<http://dbpedia.org/resource/Category:Programming_languages>)) . ?scheme skos:prefLabel ?schemeLabel } LIMIT 10"),
+
 			headers:{
 				"accept":"application/sparql-results+json"
 			}
